@@ -1895,7 +1895,7 @@ jobs:
             - electron-publish:
                 attach: false
                 checkout: true
-                build-type: Linux ARM64
+                build-type: 'Linux ARM64'
 
   osx-testing-x64:
     executor:
@@ -1985,7 +1985,7 @@ jobs:
             - electron-publish:
                 attach: true
                 checkout: false
-                build-type: 'Darwin ARM64'
+                build-type: ''
 
   osx-testing-arm64:
     executor:
@@ -2067,7 +2067,7 @@ jobs:
             - electron-publish:
                 attach: true
                 checkout: false
-                build-type: 'MAS ARM64'
+                build-type: ''
 
   # Layer 3: Tests.
   linux-x64-testing-tests:
