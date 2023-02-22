@@ -58,20 +58,25 @@ void CocoaNotification::Show(const NotificationOptions& options) {
     [notification_ setSoundName:base::SysUTF16ToNSString(options.sound)];
   }
 
-  [notification_ setHasActionButton:false];
+  if (options.has_reply) {
+    [notification_ setHasReplyButton:true];
+    [notification_ setResponsePlaceholder:base::SysUTF16ToNSString(
+                                              options.reply_placeholder)];
+  }
 
   int i = 0;
-  action_index_ = UINT_MAX;
   NSMutableArray* additionalActions =
       [[[NSMutableArray alloc] init] autorelease];
   for (const auto& action : options.actions) {
     if (action.type == u"button") {
-      if (action_index_ == UINT_MAX) {
+      // If the notification has both a reply and actions,
+      // the reply should be first, and the actions should
+      // all become additional actions.
+      if (!options.has_reply && i == 0) {
         // First button observed is the displayed action
         [notification_ setHasActionButton:true];
         [notification_
             setActionButtonTitle:base::SysUTF16ToNSString(action.text)];
-        action_index_ = i;
       } else {
         // All of the rest are appended to the list of additional actions
         NSString* actionIdentifier =
@@ -86,14 +91,9 @@ void CocoaNotification::Show(const NotificationOptions& options) {
     }
     i++;
   }
+
   if ([additionalActions count] > 0) {
     [notification_ setAdditionalActions:additionalActions];
-  }
-
-  if (options.has_reply) {
-    [notification_ setResponsePlaceholder:base::SysUTF16ToNSString(
-                                              options.reply_placeholder)];
-    [notification_ setHasReplyButton:true];
   }
 
   if (!options.close_button_text.empty()) {
