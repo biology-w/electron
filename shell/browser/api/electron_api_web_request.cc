@@ -119,23 +119,23 @@ v8::Local<v8::Value> HttpResponseHeadersToV8(
     std::string key;
     std::string value;
     while (headers->EnumerateHeaderLines(&iter, &key, &value)) {
-      // Note that Web servers not developed with nodejs allow non-utf8
-      // characters in content-disposition's filename field. Use Chromium's
-      // HttpContentDisposition class to decode the correct encoding instead of
-      // arbitrarily converting it to UTF8. It should also be noted that if the
-      // encoding is not specified, HttpContentDisposition will transcode
-      // according to the system's encoding.
-      if (base::EqualsCaseInsensitiveASCII("Content-Disposition", key) &&
-          !value.empty()) {
-        net::HttpContentDisposition header(value, std::string());
-        std::string decodedFilename =
-            header.is_attachment() ? " attachment" : " inline";
-        // The filename must be encased in double quotes for serialization
-        // to happen correctly.
-        std::string filename = "\"" + header.filename() + "\"";
-        value = decodedFilename + "; filename=" + filename;
-      }
-      base::Value::List* values = response_headers.FindList(key);
+      // // Note that Web servers not developed with nodejs allow non-utf8
+      // // characters in content-disposition's filename field. Use Chromium's
+      // // HttpContentDisposition class to decode the correct encoding instead of
+      // // arbitrarily converting it to UTF8. It should also be noted that if the
+      // // encoding is not specified, HttpContentDisposition will transcode
+      // // according to the system's encoding.
+      // if (base::EqualsCaseInsensitiveASCII("Content-Disposition", key) &&
+      //     !value.empty()) {
+      //   net::HttpContentDisposition header(value, std::string());
+      //   std::string decodedFilename =
+      //       header.is_attachment() ? " attachment" : " inline";
+      //   // The filename must be encased in double quotes for serialization
+      //   // to happen correctly.
+      //   std::string filename = "\"" + header.filename() + "\"";
+      //   value = decodedFilename + "; filename=" + filename;
+      // }
+      // base::Value::List* values = response_headers.FindList(key);
       if (!values)
         values = &response_headers.Set(key, base::Value::List())->GetList();
       values->Append(base::Value(value));
